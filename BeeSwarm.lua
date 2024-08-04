@@ -5,12 +5,12 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORI
 local CONFIG = {
     DEFAULT_SPEED = 16,
     DEFAULT_JUMP_POWER = 50,
-    GUI_WIDTH = 220,
-    GUI_HEIGHT = 300,
+    GUI_WIDTH = 300,
+    GUI_HEIGHT = 400,
     CORNER_RADIUS = UDim.new(0, 10),
     PRIMARY_COLOR = Color3.fromRGB(30, 30, 30),
     SECONDARY_COLOR = Color3.fromRGB(50, 50, 50),
-    ACCENT_COLOR = Color3.fromRGB(0, 170, 255),
+    ACCENT_COLOR = Color3.fromRGB(128, 0, 0), -- Maroon
     TEXT_COLOR = Color3.fromRGB(255, 255, 255),
     BSS_PLACE_ID = 1537690962,
     HONEY_DUPE_INTERVAL = 0.2,
@@ -22,6 +22,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 
 -- Variables
 local player = Players.LocalPlayer
@@ -31,6 +32,7 @@ local speedValue = CONFIG.DEFAULT_SPEED
 local jumpPowerValue = CONFIG.DEFAULT_JUMP_POWER
 local isDuping = false
 local isAutoHitting = false
+local isAutoQuesting = false
 local gui, mainFrame, contentFrame
 
 -- Utility Functions
@@ -64,7 +66,7 @@ end
 -- GUI Creation
 local function createGUI()
     gui = Instance.new("ScreenGui")
-    gui.Name = "EnhancedPlayerGUI"
+    gui.Name = "SpartaGUI"
     gui.ResetOnSpawn = false
     gui.Parent = player:WaitForChild("PlayerGui")
 
@@ -73,7 +75,8 @@ local function createGUI()
     mainFrame.Size = UDim2.new(0, CONFIG.GUI_WIDTH, 0, CONFIG.GUI_HEIGHT)
     mainFrame.Position = UDim2.new(0.5, -CONFIG.GUI_WIDTH/2, 0.5, -CONFIG.GUI_HEIGHT/2)
     mainFrame.BackgroundColor3 = CONFIG.PRIMARY_COLOR
-    mainFrame.BorderSizePixel = 0
+    mainFrame.BorderSizePixel = 2
+    mainFrame.BorderColor3 = CONFIG.ACCENT_COLOR
     mainFrame.Active = true
     mainFrame.Draggable = true
     mainFrame.Parent = gui
@@ -87,7 +90,7 @@ local function createGUI()
     Instance.new("UICorner", titleBar).CornerRadius = CONFIG.CORNER_RADIUS
 
     local titleLabel = createLabel("TitleLabel", UDim2.new(1, -60, 1, 0), UDim2.new(0, 10, 0, 0), titleBar)
-    titleLabel.Text = "Enhanced Player GUI"
+    titleLabel.Text = "Sparta GUI"
     titleLabel.TextSize = 18
     titleLabel.Font = Enum.Font.SourceSansBold
 
@@ -130,6 +133,15 @@ local function createGUI()
     local autoHitButton = createButton("AutoHitButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), contentFrame)
     autoHitButton.Text = "Auto Hit: OFF"
 
+    local autoQuestButton = createButton("AutoQuestButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 255), contentFrame)
+    autoQuestButton.Text = "Auto Quest: OFF"
+
+    local godModeButton = createButton("GodModeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 295), contentFrame)
+    godModeButton.Text = "God Mode: OFF"
+
+    local redeemCodesButton = createButton("RedeemCodesButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 335), contentFrame)
+    redeemCodesButton.Text = "Redeem Codes"
+
     local footer = createLabel("Footer", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 1, -20), mainFrame)
     footer.Text = "Made by Spartan"
     footer.TextSize = 12
@@ -144,6 +156,9 @@ local function createGUI()
         textureRemoverButton = textureRemoverButton,
         honeyDupeButton = honeyDupeButton,
         autoHitButton = autoHitButton,
+        autoQuestButton = autoQuestButton,
+        godModeButton = godModeButton,
+        redeemCodesButton = redeemCodesButton,
         closeButton = closeButton,
         minimizeButton = minimizeButton
     }
@@ -187,6 +202,41 @@ local function toggleAutoHit(button)
     button.Text = isAutoHitting and "Auto Hit: ON" or "Auto Hit: OFF"
 end
 
+local function toggleAutoQuest(button)
+    isAutoQuesting = not isAutoQuesting
+    button.Text = isAutoQuesting and "Auto Quest: ON" or "Auto Quest: OFF"
+end
+
+local function toggleGodMode(button)
+    local godMode = not button.Text:find("ON")
+    button.Text = godMode and "God Mode: ON" or "God Mode: OFF"
+    if godMode then
+        local function onCharacterAdded(char)
+            wait(0.5)
+            char.Humanoid.MaxHealth = math.huge
+            char.Humanoid.Health = math.huge
+        end
+        player.CharacterAdded:Connect(onCharacterAdded)
+        if player.Character then
+            onCharacterAdded(player.Character)
+        end
+    else
+        player.CharacterAdded:Connect(function() end)
+        if player.Character then
+            player.Character.Humanoid.MaxHealth = 100
+            player.Character.Humanoid.Health = 100
+        end
+    end
+end
+
+local function redeemCodes()
+    local codes = {"Millie", "Teespring", "500mil", "Marshmallow", "Banned", "Codes", "Cog", "Connoisseur", "Crawlers", "Nectar", "Planter", "Roof", "Wax", "Bopmaster", "Buzz", "Clubbean", "Cubly", "Discord100k", "Jumpstart", "Marshmallow", "Millie", "Nectar", "Roof", "Teespring", "Wink", "38217"}
+    for _, code in ipairs(codes) do
+        ReplicatedStorage.Events.PromoCodeEvent:FireServer(code)
+        wait(1)
+    end
+end
+
 local function closeGUI()
     gui:Destroy()
 end
@@ -198,14 +248,42 @@ end
 
 -- Player ESP
 local function createESP(player)
-    local esp = Instance.new("Highlight")
+    local esp = Instance.new("BillboardGui")
     esp.Name = player.Name .. "_ESP"
-    esp.FillColor = Color3.new(1, 0, 0) -- Red
-    esp.OutlineColor = Color3.new(1, 1, 1) -- White
-    esp.FillTransparency = 0.5
-    esp.OutlineTransparency = 0
-    esp.Adornee = player.Character
-    esp.Parent = player.Character
+    esp.AlwaysOnTop = true
+    esp.Size = UDim2.new(4, 0, 5.5, 0)
+    esp.StudsOffset = Vector3.new(0, 3, 0)
+    esp.Parent = player.Character.Head
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 1, 0)
+    frame.BackgroundColor3 = Color3.new(1, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.Parent = esp
+
+    local nameLabel = Instance.new("TextLabel")
+    nameLabel.Size = UDim2.new(1, 0, 0.25, 0)
+    nameLabel.Position = UDim2.new(0, 0, -0.25, 0)
+    nameLabel.BackgroundTransparency = 1
+    nameLabel.Text = player.Name
+    nameLabel.TextColor3 = Color3.new(1, 1, 1)
+    nameLabel.TextScaled = true
+    nameLabel.Parent = esp
+
+    local healthBar = Instance.new("Frame")
+    healthBar.Size = UDim2.new(0.8, 0, 0.1, 0)
+    healthBar.Position = UDim2.new(0.1, 0, 1, 0)
+    healthBar.BackgroundColor3 = Color3.new(1, 0, 0)
+    healthBar.Parent = esp
+
+    local healthFill = Instance.new("Frame")
+    healthFill.Size = UDim2.new(1, 0, 1, 0)
+    healthFill.BackgroundColor3 = Color3.new(0, 1, 0)
+    healthFill.Parent = healthBar
+
+    player.Character.Humanoid.HealthChanged:Connect(function(health)
+        healthFill.Size = UDim2.new(health / player.Character.Humanoid.MaxHealth, 0, 1, 0)
+    end)
 end
 
 local function playerAdded(player)
@@ -223,6 +301,12 @@ local function autoHit()
     if tool and tool:FindFirstChild("Handle") then
         tool:Activate()
     end
+end
+
+-- Auto Quest Function
+local function autoQuest()
+    -- Implement auto quest logic here
+    -- This will depend on the specific game's quest system
 end
 
 -- Main
@@ -261,6 +345,13 @@ local function init()
     guiElements.autoHitButton.MouseButton1Click:Connect(function()
         toggleAutoHit(guiElements.autoHitButton)
     end)
+    guiElements.autoQuestButton.MouseButton1Click:Connect(function()
+        toggleAutoQuest(guiElements.autoQuestButton)
+    end)
+    guiElements.godModeButton.MouseButton1Click:Connect(function()
+        toggleGodMode(guiElements.godModeButton)
+    end)
+    guiElements.redeemCodesButton.MouseButton1Click:Connect(redeemCodes)
     guiElements.closeButton.MouseButton1Click:Connect(closeGUI)
     guiElements.minimizeButton.MouseButton1Click:Connect(minimizeGUI)
 
@@ -282,6 +373,10 @@ local function init()
 
         if isAutoHitting then
             autoHit()
+        end
+
+        if isAutoQuesting then
+            autoQuest()
         end
     end)
 
