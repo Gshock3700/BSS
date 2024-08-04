@@ -5,9 +5,9 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORI
 
 -- Configuration
 local CONFIG = {
-    DEFAULT_SPEED = 16,
-    DEFAULT_JUMP_POWER = 50,
-    GUI_WIDTH = 300,
+    DEFAULT_SPEED = 26,
+    DEFAULT_JUMP_POWER = 80,
+    GUI_WIDTH = 370,
     GUI_HEIGHT = 400,
     CORNER_RADIUS = UDim.new(0, 10),
     PRIMARY_COLOR = Color3.fromRGB(30, 30, 30),
@@ -93,7 +93,7 @@ local function createGUI()
 
     local titleLabel = createLabel("TitleLabel", UDim2.new(1, -60, 1, 0), UDim2.new(0, 10, 0, 0), titleBar)
     titleLabel.Text = "Sparta GUI"
-    titleLabel.TextSize = 18
+    titleLabel.TextSize = 21
     titleLabel.Font = Enum.Font.SourceSansBold
 
     local closeButton = createButton("CloseButton", UDim2.new(0, 30, 0, 30), UDim2.new(1, -30, 0, 0), titleBar)
