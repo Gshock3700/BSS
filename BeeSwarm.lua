@@ -3,7 +3,6 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORI
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
 
 -- Load autofarm functions
-local autofarmFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Boxking776/kocmoc/main/games/bss.lua"))()
 
 -- Configuration
 local CONFIG = {
