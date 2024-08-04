@@ -1,9 +1,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
 
--- Variables
 local speedValue = 16 -- Default speed value
 
--- Create GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "For My Cum Slut"
 gui.Parent = game.Players.LocalPlayer.PlayerGui
@@ -46,7 +44,6 @@ increaseButton.TextSize = 14
 increaseButton.Text = "+"
 increaseButton.Parent = frame
 
--- Functions
 local function updateSpeedLabel()
     speedLabel.Text = "Sped: " .. speedValue
 end
@@ -71,11 +68,9 @@ local function onIncreaseButtonClicked()
     increaseSpeed()
 end
 
--- Event connections
 decreaseButton.MouseButton1Click:Connect(onDecreaseButtonClicked)
 increaseButton.MouseButton1Click:Connect(onIncreaseButtonClicked)
 
--- Main loop
 while true do
     -- Modify the speed of the character (you need to replace this with the appropriate code for your specific game)
     game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
