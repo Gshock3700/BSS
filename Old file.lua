@@ -1,6 +1,8 @@
 -- Load additional scripts
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
 
+-- Load autofarm functions
+
 -- Configuration
 local CONFIG = {
     DEFAULT_SPEED = 16,
@@ -109,38 +111,112 @@ local function createGUI()
     contentFrame.BackgroundTransparency = 1
     contentFrame.Parent = mainFrame
 
-    local speedLabel = createLabel("SpeedLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 10), contentFrame)
-    local jumpPowerLabel = createLabel("JumpPowerLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 70), contentFrame)
+    local tabButtons = Instance.new("Frame")
+    tabButtons.Name = "TabButtons"
+    tabButtons.Size = UDim2.new(1, 0, 0, 30)
+    tabButtons.BackgroundTransparency = 1
+    tabButtons.Parent = contentFrame
 
-    local decreaseSpeedButton = createButton("DecreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 35), contentFrame)
+    local mainTabButton = createButton("MainTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0, 0, 0, 0), tabButtons)
+    mainTabButton.Text = "Main"
+
+    local farmingTabButton = createButton("FarmingTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.25, 5, 0, 0), tabButtons)
+    farmingTabButton.Text = "Farming"
+
+    local miscTabButton = createButton("MiscTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.5, 10, 0, 0), tabButtons)
+    miscTabButton.Text = "Misc"
+
+    local autofarmTabButton = createButton("AutofarmTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.75, 15, 0, 0), tabButtons)
+    autofarmTabButton.Text = "Autofarm"
+
+    local mainTab = Instance.new("Frame")
+    mainTab.Name = "MainTab"
+    mainTab.Size = UDim2.new(1, 0, 1, -40)
+    mainTab.Position = UDim2.new(0, 0, 0, 40)
+    mainTab.BackgroundTransparency = 1
+    mainTab.Parent = contentFrame
+
+    local farmingTab = Instance.new("Frame")
+    farmingTab.Name = "FarmingTab"
+    farmingTab.Size = UDim2.new(1, 0, 1, -40)
+    farmingTab.Position = UDim2.new(0, 0, 0, 40)
+    farmingTab.BackgroundTransparency = 1
+    farmingTab.Visible = false
+    farmingTab.Parent = contentFrame
+
+    local miscTab = Instance.new("Frame")
+    miscTab.Name = "MiscTab"
+    miscTab.Size = UDim2.new(1, 0, 1, -40)
+    miscTab.Position = UDim2.new(0, 0, 0, 40)
+    miscTab.BackgroundTransparency = 1
+    miscTab.Visible = false
+    miscTab.Parent = contentFrame
+
+    local autofarmTab = Instance.new("Frame")
+    autofarmTab.Name = "AutofarmTab"
+    autofarmTab.Size = UDim2.new(1, 0, 1, -40)
+    autofarmTab.Position = UDim2.new(0, 0, 0, 40)
+    autofarmTab.BackgroundTransparency = 1
+    autofarmTab.Visible = false
+    autofarmTab.Parent = contentFrame
+
+    local speedLabel = createLabel("SpeedLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 10), mainTab)
+    local jumpPowerLabel = createLabel("JumpPowerLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 70), mainTab)
+
+    local decreaseSpeedButton = createButton("DecreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 35), mainTab)
     decreaseSpeedButton.Text = "-"
 
-    local increaseSpeedButton = createButton("IncreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 35), contentFrame)
+    local increaseSpeedButton = createButton("IncreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 35), mainTab)
     increaseSpeedButton.Text = "+"
 
-    local decreaseJumpPowerButton = createButton("DecreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 95), contentFrame)
+    local decreaseJumpPowerButton = createButton("DecreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 95), mainTab)
     decreaseJumpPowerButton.Text = "-"
 
-    local increaseJumpPowerButton = createButton("IncreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 95), contentFrame)
+    local increaseJumpPowerButton = createButton("IncreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 95), mainTab)
     increaseJumpPowerButton.Text = "+"
 
-    local textureRemoverButton = createButton("TextureRemoverButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 135), contentFrame)
+    local textureRemoverButton = createButton("TextureRemoverButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 135), mainTab)
     textureRemoverButton.Text = "Remove Textures"
 
-    local honeyDupeButton = createButton("HoneyDupeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 175), contentFrame)
+    local honeyDupeButton = createButton("HoneyDupeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 175), mainTab)
     honeyDupeButton.Text = "Honey Dupe: OFF"
 
-    local autoHitButton = createButton("AutoHitButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), contentFrame)
+    local autoHitButton = createButton("AutoHitButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), mainTab)
     autoHitButton.Text = "Auto Hit: OFF"
 
-    local autoQuestButton = createButton("AutoQuestButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 255), contentFrame)
+    local autoQuestButton = createButton("AutoQuestButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 255), mainTab)
     autoQuestButton.Text = "Auto Quest: OFF"
 
-    local godModeButton = createButton("GodModeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 295), contentFrame)
+    local godModeButton = createButton("GodModeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 295), mainTab)
     godModeButton.Text = "God Mode: OFF"
 
-    local redeemCodesButton = createButton("RedeemCodesButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 335), contentFrame)
+    local redeemCodesButton = createButton("RedeemCodesButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 335), mainTab)
     redeemCodesButton.Text = "Redeem Codes"
+
+    local farmingLabel = createLabel("FarmingLabel", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 0), farmingTab)
+    farmingLabel.Text = "cumming soon dirty nigger yes, you nick ;)"
+    farmingLabel.TextSize = 18
+    farmingLabel.Font = Enum.Font.SourceSansBold
+
+    -- Add autofarm buttons
+    local autofarmButtons = {
+        "Honey", "Tokens", "Goo", "Coconuts", "Stingers", "Pineapples",
+        "Collect Tokens", "Collect Bubbles", "Farm Sprouts", "Farm Ants",
+        "Farm Fireflies", "Farm Snowflakes", "Farm Fuzzy Bombs",
+        "Farm Coconuts", "Farm Strawberries", "Farm Pineapples"
+    }
+
+    for i, farmType in ipairs(autofarmButtons) do
+        local button = createButton(farmType .. "Button", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, (i-1)*35), autofarmTab)
+        button.Text = "Autofarm " .. farmType
+        button.MouseButton1Click:Connect(function()
+            if autofarmFunctions[farmType] then
+                autofarmFunctions[farmType]()
+            else
+                print("Autofarm function for " .. farmType .. " not found.")
+            end
+        end)
+    end
 
     local footer = createLabel("Footer", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 1, -20), mainFrame)
     footer.Text = "Made by Spartan"
@@ -160,7 +236,16 @@ local function createGUI()
         godModeButton = godModeButton,
         redeemCodesButton = redeemCodesButton,
         closeButton = closeButton,
-        minimizeButton = minimizeButton
+        minimizeButton = minimizeButton,
+        mainTabButton = mainTabButton,
+        farmingTabButton = farmingTabButton,
+        miscTabButton = miscTabButton,
+        autofarmTabButton = autofarmTabButton,
+        mainTab = mainTab,
+        farmingTab = farmingTab,
+        miscTab = miscTab,
+        autofarmTab = autofarmTab,
+        footer = footer
     }
 end
 
@@ -177,7 +262,7 @@ local function removeTextures()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") and not v:IsA("MeshPart") then
             v.Material = Enum.Material.SmoothPlastic
-            v.Reflectance = 0
+                        v.Reflectance = 0
         elseif v:IsA("Decal") or v:IsA("Texture") then
             v.Transparency = 1
         elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
@@ -200,6 +285,27 @@ end
 local function toggleAutoHit(button)
     isAutoHitting = not isAutoHitting
     button.Text = isAutoHitting and "Auto Hit: ON" or "Auto Hit: OFF"
+    if isAutoHitting then
+        local field = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if field then
+            -- Plant sprinkler
+            local args = {
+                [1] = {
+                    ["Name"] = "Sprinkler Builder"
+                }
+            }
+            game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+            
+            -- Start collecting pollen
+            while isAutoHitting do
+                local args = {
+                    [1] = field.Position
+                }
+                game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                wait(0.1)
+            end
+        end
+    end
 end
 
 local function toggleAutoQuest(button)
@@ -305,8 +411,30 @@ end
 
 -- Auto Quest Function
 local function autoQuest()
-    -- Implement auto quest logic here
-    -- This will depend on the specific game's quest system
+    local quests = workspace.Quests:GetChildren()
+    for _, quest in ipairs(quests) do
+        if quest:IsA("Model") and quest:FindFirstChild("QuestPart") then
+            local questPart = quest.QuestPart
+            local questInfo = questPart:FindFirstChild("QuestInfo")
+            if questInfo and questInfo:IsA("StringValue") then
+                local questText = questInfo.Value
+                local fieldName = questText:match("gather %d+ pollen from (.+)")
+                if fieldName then
+                    local field = workspace.FlowerZones:FindFirstChild(fieldName)
+                    if field then
+                        player.Character.HumanoidRootPart.CFrame = field.CFrame + Vector3.new(0, 5, 0)
+                        wait(1)
+                        -- Simulate gathering pollen
+                        local args = {
+                            [1] = field.Position
+                        }
+                        game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
+                        wait(5)  -- Wait for 5 seconds before moving to the next quest
+                    end
+                end
+            end
+        end
+    end
 end
 
 -- Main
@@ -339,21 +467,56 @@ local function init()
     end)
 
     guiElements.textureRemoverButton.MouseButton1Click:Connect(removeTextures)
+
     guiElements.honeyDupeButton.MouseButton1Click:Connect(function()
         toggleHoneyDupe(guiElements.honeyDupeButton)
     end)
+
     guiElements.autoHitButton.MouseButton1Click:Connect(function()
         toggleAutoHit(guiElements.autoHitButton)
     end)
+
     guiElements.autoQuestButton.MouseButton1Click:Connect(function()
         toggleAutoQuest(guiElements.autoQuestButton)
     end)
+
     guiElements.godModeButton.MouseButton1Click:Connect(function()
         toggleGodMode(guiElements.godModeButton)
     end)
+
     guiElements.redeemCodesButton.MouseButton1Click:Connect(redeemCodes)
+
     guiElements.closeButton.MouseButton1Click:Connect(closeGUI)
+
     guiElements.minimizeButton.MouseButton1Click:Connect(minimizeGUI)
+
+    guiElements.mainTabButton.MouseButton1Click:Connect(function()
+        guiElements.mainTab.Visible = true
+        guiElements.farmingTab.Visible = false
+        guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = false
+    end)
+
+    guiElements.farmingTabButton.MouseButton1Click:Connect(function()
+        guiElements.mainTab.Visible = false
+        guiElements.farmingTab.Visible = true
+        guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = false
+    end)
+
+    guiElements.miscTabButton.MouseButton1Click:Connect(function()
+        guiElements.mainTab.Visible = false
+        guiElements.farmingTab.Visible = false
+        guiElements.miscTab.Visible = true
+        guiElements.autofarmTab.Visible = false
+    end)
+
+    guiElements.autofarmTabButton.MouseButton1Click:Connect(function()
+        guiElements.mainTab.Visible = false
+        guiElements.farmingTab.Visible = false
+        guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = true
+    end)
 
     -- Set up ESP
     for _, player in ipairs(Players:GetPlayers()) do
@@ -361,6 +524,7 @@ local function init()
             playerAdded(player)
         end
     end
+
     Players.PlayerAdded:Connect(playerAdded)
 
     -- Main loop
@@ -408,6 +572,22 @@ local function init()
     -- Update labels
     updateSpeedLabel(guiElements.speedLabel)
     updateJumpPowerLabel(guiElements.jumpPowerLabel)
+
+    -- Increase bee damage
+    local beeModule = require(game:GetService("ReplicatedStorage").BeeTypes)
+    for _, beeData in pairs(beeModule) do
+        if beeData.Attack then
+            beeData.Attack *= 20
+        end
+    end
+
+    -- Remove tool cooldown
+    local playerScripts = player:WaitForChild("PlayerScripts")
+    local toolHandler = playerScripts:WaitForChild("ToolHandler")
+    local cooldownScript = toolHandler:FindFirstChild("Cooldown")
+    if cooldownScript then
+        cooldownScript:Destroy()
+    end
 end
 
 -- Run the script
