@@ -351,64 +351,34 @@ local function init()
     guiElements.godModeButton.MouseButton1Click:Connect(function()
         toggleGodMode(guiElements.godModeButton)
     end)
-    guiElements.redeemCodesButton.MouseButton1Click:Connect(redeemCodes)
-    guiElements.closeButton.MouseButton1Click:Connect(closeGUI)
+    guiElements.redeemCodesButton.MouseButton1Click:ConnectAsync("https://example.com").ConfigureAwait(false);
+        guiElements.closeButton.MouseButton1Click:Connect(closeGUI)
     guiElements.minimizeButton.MouseButton1Click:Connect(minimizeGUI)
 
-    -- Set up ESP
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= Players.LocalPlayer then
-            playerAdded(player)
-        end
-    end
+    -- Player added/removed event
     Players.PlayerAdded:Connect(playerAdded)
+    Players.PlayerRemoved:Connect(function(player) end)
 
-    -- Main loop
+    -- Auto Hit and Quest Logic
     RunService.Heartbeat:Connect(function()
-        if character and character:FindFirstChild("Humanoid") then
-            humanoid = character.Humanoid
-            humanoid.WalkSpeed = speedValue
-            humanoid.JumpPower = jumpPowerValue
-        end
-
         if isAutoHitting then
             autoHit()
         end
-
         if isAutoQuesting then
             autoQuest()
         end
     end)
 
-    -- Honey dupe loop
-    spawn(function()
-        while true do
-            if isDuping and game.PlaceId == CONFIG.BSS_PLACE_ID then
-                pcall(function()
-                    ReplicatedStorage.Events.ClientToServer.ClaimHoneyToken:FireServer(10000)
-                end)
-            end
-            wait(CONFIG.HONEY_DUPE_INTERVAL)
+    -- Load the GUI elements into the player's Players folder to persist across game restarts.
+    for _, player in pairs(Players:GetPlayers()) do
+        local guiElementsFolder = Instance.new("Folder")
+        guiElementsFolder.Name = "SpartaGUI"
+        guiElementsFolder.Parent = player.Backpack
+
+        for key, element in pairs(guiElements) do
+            element.Parent = guiElementsFolder
         end
-    end)
-
-    -- Character respawn handler
-    player.CharacterAdded:Connect(function(newCharacter)
-        character = newCharacter
-        humanoid = character:WaitForChild("Humanoid")
-    end)
-
-    -- Anti-AFK
-    local virtualUser = game:GetService("VirtualUser")
-    player.Idled:Connect(function()
-        virtualUser:CaptureController()
-        virtualUser:ClickButton2(Vector2.new())
-    end)
-
-    -- Update labels
-    updateSpeedLabel(guiElements.speedLabel)
-    updateJumpPowerLabel(guiElements.jumpPowerLabel)
+    end
 end
 
--- Run the script
 init()
