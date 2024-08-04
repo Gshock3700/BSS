@@ -1,66 +1,68 @@
-local Library = {Toggle = true,FirstTab = nil,TabCount = 0,ColorTable = {}}
+local Library = {Toggle = true, FirstTab = nil, TabCount = 0, ColorTable = {}}
 
 local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+
 _G.windowname = HttpService:GenerateGUID(false)
 
 local function MakeDraggable(ClickObject, Object)
-	local Dragging = nil
-	local DragInput = nil
-	local DragStart = nil
-	local StartPosition = nil
-	
-	ClickObject.InputBegan:Connect(function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-			Dragging = true
-			DragStart = Input.Position
-			StartPosition = Object.Position
-			
-			Input.Changed:Connect(function()
-				if Input.UserInputState == Enum.UserInputState.End then
-					Dragging = false
-				end
-			end)
-		end
-	end)
-	
-	ClickObject.InputChanged:Connect(function(Input)
-		if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
-			DragInput = Input
-		end
-	end)
-	
-	UserInputService.InputChanged:Connect(function(Input)
-		if Input == DragInput and Dragging then
-			local Delta = Input.Position - DragStart
-			Object.Position = UDim2.new(StartPosition.X.Scale, StartPosition.X.Offset + Delta.X, StartPosition.Y.Scale, StartPosition.Y.Offset + Delta.Y)
-		end
-	end)
+    local Dragging = nil
+    local DragInput = nil
+    local DragStart = nil
+    local StartPosition = nil
+    
+    ClickObject.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = Input.Position
+            StartPosition = Object.Position
+            
+            Input.Changed:Connect(function()
+                if Input.UserInputState == Enum.UserInputState.End then
+                    Dragging = false
+                end
+            end)
+        end
+    end)
+    
+    ClickObject.InputChanged:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+            DragInput = Input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(Input)
+        if Input == DragInput and Dragging then
+            local Delta = Input.Position - DragStart
+            Object.Position = UDim2.new(StartPosition.X.Scale, StartPosition.X.Offset + Delta.X, StartPosition.Y.Scale, StartPosition.Y.Offset + Delta.Y)
+        end
+    end)
 end
 
 function Library:CreateWindow(Config, Parent)
-	local WindowInit = {}
-	local Folder = game:GetObjects("rbxassetid://7141683860")[1]
-	local Screen = Folder.Bracket:Clone()
-	local Main = Screen.Main
-	local Holder = Main.Holder
-	local Topbar = Main.Topbar
-	local TContainer = Holder.TContainer
-	local TBContainer = Holder.TBContainer.Holder
-	--[[
-	-- idk probably fix for exploits that dont have this function
-	if syn and syn.protect_gui then
-		syn.protect_gui(Screen)
-	end
-	]]
-	
-	Screen.Name = _G.windowname
-	Screen.Parent = Parent
-	Topbar.WindowName.Text = Config.WindowName
+    local WindowInit = {}
+    local Folder = game:GetObjects("rbxassetid://7141683860")[1]
+    local Screen = Folder.Bracket:Clone()
+    local Main = Screen.Main
+    local Holder = Main.Holder
+    local Topbar = Main.Topbar
+    local TContainer = Holder.TContainer
+    local TBContainer = Holder.TBContainer.Holder
+    
+    Screen.Name = _G.windowname
+    Screen.Parent = Parent
+    Topbar.WindowName.Text = Config.WindowName
 
-	MakeDraggable(Topbar,Main)
+    MakeDraggable(Topbar, Main)
+    return WindowInit
+end
+
+return Library
+
+
+	
 	local function CloseAll()
 		for _,Tab in pairs(TContainer:GetChildren()) do
 			if Tab:IsA("ScrollingFrame") then
