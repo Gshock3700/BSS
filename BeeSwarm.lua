@@ -1,5 +1,9 @@
+-- Load additional scripts
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
+
+-- Load autofarm functions
+local autofarmFunctions = loadstring(game:HttpGet("https://raw.githubusercontent.com/Boxking776/kocmoc/main/games/bss.lua"))()
 
 -- Configuration
 local CONFIG = {
@@ -115,14 +119,17 @@ local function createGUI()
     tabButtons.BackgroundTransparency = 1
     tabButtons.Parent = contentFrame
 
-    local mainTabButton = createButton("MainTabButton", UDim2.new(0.33, -5, 1, 0), UDim2.new(0, 0, 0, 0), tabButtons)
+    local mainTabButton = createButton("MainTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0, 0, 0, 0), tabButtons)
     mainTabButton.Text = "Main"
 
-    local farmingTabButton = createButton("FarmingTabButton", UDim2.new(0.33, -5, 1, 0), UDim2.new(0.33, 5, 0, 0), tabButtons)
+    local farmingTabButton = createButton("FarmingTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.25, 5, 0, 0), tabButtons)
     farmingTabButton.Text = "Farming"
 
-    local miscTabButton = createButton("MiscTabButton", UDim2.new(0.33, -5, 1, 0), UDim2.new(0.66, 10, 0, 0), tabButtons)
+    local miscTabButton = createButton("MiscTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.5, 10, 0, 0), tabButtons)
     miscTabButton.Text = "Misc"
+
+    local autofarmTabButton = createButton("AutofarmTabButton", UDim2.new(0.25, -5, 1, 0), UDim2.new(0.75, 15, 0, 0), tabButtons)
+    autofarmTabButton.Text = "Autofarm"
 
     local mainTab = Instance.new("Frame")
     mainTab.Name = "MainTab"
@@ -146,6 +153,14 @@ local function createGUI()
     miscTab.BackgroundTransparency = 1
     miscTab.Visible = false
     miscTab.Parent = contentFrame
+
+    local autofarmTab = Instance.new("Frame")
+    autofarmTab.Name = "AutofarmTab"
+    autofarmTab.Size = UDim2.new(1, 0, 1, -40)
+    autofarmTab.Position = UDim2.new(0, 0, 0, 40)
+    autofarmTab.BackgroundTransparency = 1
+    autofarmTab.Visible = false
+    autofarmTab.Parent = contentFrame
 
     local speedLabel = createLabel("SpeedLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 10), mainTab)
     local jumpPowerLabel = createLabel("JumpPowerLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 70), mainTab)
@@ -185,6 +200,26 @@ local function createGUI()
     farmingLabel.TextSize = 18
     farmingLabel.Font = Enum.Font.SourceSansBold
 
+    -- Add autofarm buttons
+    local autofarmButtons = {
+        "Honey", "Tokens", "Goo", "Coconuts", "Stingers", "Pineapples",
+        "Collect Tokens", "Collect Bubbles", "Farm Sprouts", "Farm Ants",
+        "Farm Fireflies", "Farm Snowflakes", "Farm Fuzzy Bombs",
+        "Farm Coconuts", "Farm Strawberries", "Farm Pineapples"
+    }
+
+    for i, farmType in ipairs(autofarmButtons) do
+        local button = createButton(farmType .. "Button", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, (i-1)*35), autofarmTab)
+        button.Text = "Autofarm " .. farmType
+        button.MouseButton1Click:Connect(function()
+            if autofarmFunctions[farmType] then
+                autofarmFunctions[farmType]()
+            else
+                print("Autofarm function for " .. farmType .. " not found.")
+            end
+        end)
+    end
+
     local footer = createLabel("Footer", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 1, -20), mainFrame)
     footer.Text = "Made by Spartan"
     footer.TextSize = 12
@@ -207,9 +242,11 @@ local function createGUI()
         mainTabButton = mainTabButton,
         farmingTabButton = farmingTabButton,
         miscTabButton = miscTabButton,
+        autofarmTabButton = autofarmTabButton,
         mainTab = mainTab,
         farmingTab = farmingTab,
         miscTab = miscTab,
+        autofarmTab = autofarmTab,
         footer = footer
     }
 end
@@ -227,7 +264,7 @@ local function removeTextures()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") and not v:IsA("MeshPart") then
             v.Material = Enum.Material.SmoothPlastic
-            v.Reflectance = 0
+                        v.Reflectance = 0
         elseif v:IsA("Decal") or v:IsA("Texture") then
             v.Transparency = 1
         elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
@@ -287,7 +324,7 @@ local function toggleGodMode(button)
             char.Humanoid.MaxHealth = math.huge
             char.Humanoid.Health = math.huge
         end
-                player.CharacterAdded:Connect(onCharacterAdded)
+        player.CharacterAdded:Connect(onCharacterAdded)
         if player.Character then
             onCharacterAdded(player.Character)
         end
@@ -459,18 +496,28 @@ local function init()
         guiElements.mainTab.Visible = true
         guiElements.farmingTab.Visible = false
         guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = false
     end)
 
     guiElements.farmingTabButton.MouseButton1Click:Connect(function()
         guiElements.mainTab.Visible = false
         guiElements.farmingTab.Visible = true
         guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = false
     end)
 
     guiElements.miscTabButton.MouseButton1Click:Connect(function()
         guiElements.mainTab.Visible = false
         guiElements.farmingTab.Visible = false
         guiElements.miscTab.Visible = true
+        guiElements.autofarmTab.Visible = false
+    end)
+
+    guiElements.autofarmTabButton.MouseButton1Click:Connect(function()
+        guiElements.mainTab.Visible = false
+        guiElements.farmingTab.Visible = false
+        guiElements.miscTab.Visible = false
+        guiElements.autofarmTab.Visible = true
     end)
 
     -- Set up ESP
@@ -547,4 +594,3 @@ end
 
 -- Run the script
 init()
-
