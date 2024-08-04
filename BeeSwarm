@@ -1,0 +1,103 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
+
+-- Variables
+local speedValue = 16 -- Default speed value
+
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "For My Cum Slut"
+gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+local frame = Instance.new("Frame")
+frame.Name = "SpeedFrame"
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0, 10, 0, 10)
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BackgroundTransparency = 0.5
+frame.Parent = gui
+
+local speedLabel = Instance.new("TextLabel")
+speedLabel.Name = "SpeedLabel"
+speedLabel.Size = UDim2.new(0, 180, 0, 30)
+speedLabel.Position = UDim2.new(0, 10, 0, 10)
+speedLabel.BackgroundColor3 = Color3.new(0, 0, 0)
+speedLabel.TextColor3 = Color3.new(1, 1, 1)
+speedLabel.TextSize = 18
+speedLabel.Text = "Sped: " .. speedValue
+speedLabel.Parent = frame
+
+local decreaseButton = Instance.new("TextButton")
+decreaseButton.Name = "DecreaseButton"
+decreaseButton.Size = UDim2.new(0, 50, 0, 30)
+decreaseButton.Position = UDim2.new(0, 10, 0, 50)
+decreaseButton.BackgroundColor3 = Color3.new(0, 1, 0)
+decreaseButton.TextColor3 = Color3.new(1, 1, 1)
+decreaseButton.TextSize = 14
+decreaseButton.Text = "-"
+decreaseButton.Parent = frame
+
+local increaseButton = Instance.new("TextButton")
+increaseButton.Name = "IncreaseButton"
+increaseButton.Size = UDim2.new(0, 50, 0, 30)
+increaseButton.Position = UDim2.new(0, 140, 0, 50)
+increaseButton.BackgroundColor3 = Color3.new(0, 1, 0)
+increaseButton.TextColor3 = Color3.new(1, 1, 1)
+increaseButton.TextSize = 14
+increaseButton.Text = "+"
+increaseButton.Parent = frame
+
+-- Functions
+local function updateSpeedLabel()
+    speedLabel.Text = "Sped: " .. speedValue
+end
+
+local function decreaseSpeed()
+    if speedValue > 1 then
+        speedValue = speedValue - 1
+        updateSpeedLabel()
+    end
+end
+
+local function increaseSpeed()
+    speedValue = speedValue + 1
+    updateSpeedLabel()
+end
+
+local function onDecreaseButtonClicked()
+    decreaseSpeed()
+end
+
+local function onIncreaseButtonClicked()
+    increaseSpeed()
+end
+
+-- Event connections
+decreaseButton.MouseButton1Click:Connect(onDecreaseButtonClicked)
+increaseButton.MouseButton1Click:Connect(onIncreaseButtonClicked)
+
+-- Main loop
+while true do
+    -- Modify the speed of the character (you need to replace this with the appropriate code for your specific game)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+    wait(0.1) -- Adjust the wait time as desired
+end
+
+wait(0.5)local ba=Instance.new("ScreenGui")
+local ca=Instance.new("TextLabel")local da=Instance.new("Frame")
+local _b=Instance.new("TextLabel")local ab=Instance.new("TextLabel")ba.Parent=game.CoreGui
+ba.ZIndexBehavior=Enum.ZIndexBehavior.Sibling;ca.Parent=ba;ca.Active=true
+ca.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)ca.Draggable=true
+ca.Position=UDim2.new(0.698610067,0,0.098096624,0)ca.Size=UDim2.new(0,370,0,52)
+ca.Font=Enum.Font.SourceSansSemibold;ca.Text="Anti AFK Script"ca.TextColor3=Color3.new(0,1,1)
+ca.TextSize=22;da.Parent=ca
+da.BackgroundColor3=Color3.new(0.196078,0.196078,0.196078)da.Position=UDim2.new(0,0,1.0192306,0)
+da.Size=UDim2.new(0,370,0,107)_b.Parent=da
+_b.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)_b.Position=UDim2.new(0,0,0.800455689,0)
+_b.Size=UDim2.new(0,370,0,21)_b.Font=Enum.Font.Arial;_b.Text="Made by Dynamic. (please subscribe)"
+_b.TextColor3=Color3.new(0,1,1)_b.TextSize=20;ab.Parent=da
+ab.BackgroundColor3=Color3.new(0.176471,0.176471,0.176471)ab.Position=UDim2.new(0,0,0.158377,0)
+ab.Size=UDim2.new(0,370,0,44)ab.Font=Enum.Font.ArialBold;ab.Text="Status: Active"
+ab.TextColor3=Color3.new(0,1,1)ab.TextSize=20;local bb=game:service'VirtualUser'
+game:service'Players'.LocalPlayer.Idled:connect(function()
+bb:CaptureController()bb:ClickButton2(Vector2.new())
+ab.Text="Roblox Tried to kick you but we didnt let them kick you :D"wait(2)ab.Text="Status : Active"end)
