@@ -1,8 +1,6 @@
 -- Load additional scripts
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
 
--- Load autofarm functions
-
 -- Configuration
 local CONFIG = {
     DEFAULT_SPEED = 26,
@@ -16,7 +14,7 @@ local CONFIG = {
     TEXT_COLOR = Color3.fromRGB(255, 255, 255),
     BSS_PLACE_ID = 1537690962,
     HONEY_DUPE_INTERVAL = 0.2,
-    AUTO_HIT_INTERVAL = 0.2
+    AUTO_HIT_INTERVAL = 0.1
 }
 
 -- Services
@@ -25,6 +23,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
 
 -- Variables
 local player = Players.LocalPlayer
@@ -33,8 +32,8 @@ local humanoid = character:WaitForChild("Humanoid")
 local speedValue = CONFIG.DEFAULT_SPEED
 local jumpPowerValue = CONFIG.DEFAULT_JUMP_POWER
 local isDuping = false
-local isAutoHitting = false
 local isAutoQuesting = false
+local isGodMode = false
 local gui, mainFrame, contentFrame
 
 -- Utility Functions
@@ -49,6 +48,15 @@ local function createButton(name, size, position, parent)
     button.Font = Enum.Font.SourceSansBold
     button.Parent = parent
     Instance.new("UICorner", button).CornerRadius = CONFIG.CORNER_RADIUS
+    
+    -- Add hover effect
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = CONFIG.ACCENT_COLOR}):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = CONFIG.SECONDARY_COLOR}):Play()
+    end)
+    
     return button
 end
 
@@ -181,20 +189,17 @@ local function createGUI()
     local honeyDupeButton = createButton("HoneyDupeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 175), mainTab)
     honeyDupeButton.Text = "Honey Dupe: OFF"
 
-    local autoHitButton = createButton("AutoHitButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), mainTab)
-    autoHitButton.Text = "Auto Hit: OFF"
-
-    local autoQuestButton = createButton("AutoQuestButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 255), mainTab)
+    local autoQuestButton = createButton("AutoQuestButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), mainTab)
     autoQuestButton.Text = "Auto Quest: OFF"
 
-    local godModeButton = createButton("GodModeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 295), mainTab)
+    local godModeButton = createButton("GodModeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 255), mainTab)
     godModeButton.Text = "God Mode: OFF"
 
-    local redeemCodesButton = createButton("RedeemCodesButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 335), mainTab)
+    local redeemCodesButton = createButton("RedeemCodesButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 295), mainTab)
     redeemCodesButton.Text = "Redeem Codes"
 
     local farmingLabel = createLabel("FarmingLabel", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 0), farmingTab)
-    farmingLabel.Text = "cumming soon dirty nigger yes, you nick ;)"
+    farmingLabel.Text = "Farming features coming soon!"
     farmingLabel.TextSize = 18
     farmingLabel.Font = Enum.Font.SourceSansBold
 
@@ -210,7 +215,7 @@ local function createGUI()
         local button = createButton(farmType .. "Button", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, (i-1)*35), autofarmTab)
         button.Text = "Autofarm " .. farmType
         button.MouseButton1Click:Connect(function()
-            if autofarmFunctions[farmType] then
+            if autofarmFunctions and autofarmFunctions[farmType] then
                 autofarmFunctions[farmType]()
             else
                 print("Autofarm function for " .. farmType .. " not found.")
@@ -231,7 +236,6 @@ local function createGUI()
         increaseJumpPowerButton = increaseJumpPowerButton,
         textureRemoverButton = textureRemoverButton,
         honeyDupeButton = honeyDupeButton,
-        autoHitButton = autoHitButton,
         autoQuestButton = autoQuestButton,
         godModeButton = godModeButton,
         redeemCodesButton = redeemCodesButton,
@@ -262,10 +266,10 @@ local function removeTextures()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") and not v:IsA("MeshPart") then
             v.Material = Enum.Material.SmoothPlastic
-                        v.Reflectance = 0
+            v.Reflectance = 0
         elseif v:IsA("Decal") or v:IsA("Texture") then
             v.Transparency = 1
-        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
             v.Lifetime = NumberRange.new(0)
         elseif v:IsA("Explosion") then
             v.BlastPressure = 1
@@ -282,41 +286,15 @@ local function toggleHoneyDupe(button)
     button.Text = isDuping and "Honey Dupe: ON" or "Honey Dupe: OFF"
 end
 
-local function toggleAutoHit(button)
-    isAutoHitting = not isAutoHitting
-    button.Text = isAutoHitting and "Auto Hit: ON" or "Auto Hit: OFF"
-    if isAutoHitting then
-        local field = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if field then
-            -- Plant sprinkler
-            local args = {
-                [1] = {
-                    ["Name"] = "Sprinkler Builder"
-                }
-            }
-            game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
-            
-            -- Start collecting pollen
-            while isAutoHitting do
-                local args = {
-                    [1] = field.Position
-                }
-                game:GetService("ReplicatedStorage").Events.PlayerActivesCommand:FireServer(unpack(args))
-                wait(0.1)
-            end
-        end
-    end
-end
-
 local function toggleAutoQuest(button)
     isAutoQuesting = not isAutoQuesting
     button.Text = isAutoQuesting and "Auto Quest: ON" or "Auto Quest: OFF"
 end
 
 local function toggleGodMode(button)
-    local godMode = not button.Text:find("ON")
-    button.Text = godMode and "God Mode: ON" or "God Mode: OFF"
-    if godMode then
+    isGodMode = not isGodMode
+    button.Text = isGodMode and "God Mode: ON" or "God Mode: OFF"
+    if isGodMode then
         local function onCharacterAdded(char)
             wait(0.5)
             char.Humanoid.MaxHealth = math.huge
@@ -472,10 +450,6 @@ local function init()
         toggleHoneyDupe(guiElements.honeyDupeButton)
     end)
 
-    guiElements.autoHitButton.MouseButton1Click:Connect(function()
-        toggleAutoHit(guiElements.autoHitButton)
-    end)
-
     guiElements.autoQuestButton.MouseButton1Click:Connect(function()
         toggleAutoQuest(guiElements.autoQuestButton)
     end)
@@ -535,9 +509,8 @@ local function init()
             humanoid.JumpPower = jumpPowerValue
         end
 
-        if isAutoHitting then
-            autoHit()
-        end
+        -- Always keep the tool active and digging pollen
+        autoHit()
 
         if isAutoQuesting then
             autoQuest()
