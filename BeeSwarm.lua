@@ -1,6 +1,5 @@
 -- Load additional scripts
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Gshock3700/BSS/main/BeeSwarm.lua"))()
 
 -- Configuration
 local CONFIG = {
