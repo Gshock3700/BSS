@@ -1,5 +1,7 @@
 -- Load the original script
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
+end)
 
 -- Variables
 local speedValue = 16 -- Default speed value
@@ -10,7 +12,8 @@ local humanoid = character:WaitForChild("Humanoid")
 -- Create GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "SpeedGUI"
-gui.Parent = player.PlayerGui
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
 frame.Name = "SpeedFrame"
@@ -109,10 +112,12 @@ game:GetService("Lighting").GlobalShadows = false
 game:GetService("Lighting").FogEnd = 9e9
 
 -- Main loop
-spawn(function()
+task.spawn(function()
     while true do
-        humanoid.WalkSpeed = speedValue
-        wait(0.1)
+        if humanoid then
+            humanoid.WalkSpeed = speedValue
+        end
+        task.wait(0.1)
     end
 end)
 
