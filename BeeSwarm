@@ -82,6 +82,8 @@ for key, value in pairs(config) do
         game:GetService("RunService"):SetFastFlag(key, value)
     end
 end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
 ]]
 
 loadstring(script)()
