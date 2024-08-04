@@ -1,15 +1,22 @@
+-- Load additional scripts
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Historia00012/HISTORIAHUB/main/BSS%20FREE"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Gshock3700/BSS/main/BeeSwarm.lua"))()
+
 -- Configuration
 local CONFIG = {
     DEFAULT_SPEED = 16,
     DEFAULT_JUMP_POWER = 50,
-    GUI_WIDTH = 200,
-    GUI_HEIGHT = 260,
+    GUI_WIDTH = 220,
+    GUI_HEIGHT = 300,
     CORNER_RADIUS = UDim.new(0, 10),
-    PRIMARY_COLOR = Color3.new(0, 0, 0),
-    SECONDARY_COLOR = Color3.fromRGB(128, 0, 0),
+    PRIMARY_COLOR = Color3.fromRGB(30, 30, 30),
+    SECONDARY_COLOR = Color3.fromRGB(50, 50, 50),
+    ACCENT_COLOR = Color3.fromRGB(0, 170, 255),
+    TEXT_COLOR = Color3.fromRGB(255, 255, 255),
     BSS_PLACE_ID = 1537690962,
     HONEY_DUPE_INTERVAL = 0.2,
-    UPDATE_INTERVAL = 0.1
+    UPDATE_INTERVAL = 0.1,
+    AUTO_HIT_INTERVAL = 0.2
 }
 
 -- Services
@@ -25,6 +32,7 @@ local humanoid = character:WaitForChild("Humanoid")
 local speedValue = CONFIG.DEFAULT_SPEED
 local jumpPowerValue = CONFIG.DEFAULT_JUMP_POWER
 local isDuping = false
+local isAutoHitting = false
 local gui, mainFrame, contentFrame
 
 -- Utility Functions
@@ -34,8 +42,9 @@ local function createButton(name, size, position, parent)
     button.Size = size
     button.Position = position
     button.BackgroundColor3 = CONFIG.SECONDARY_COLOR
-    button.TextColor3 = Color3.new(1, 1, 1)
+    button.TextColor3 = CONFIG.TEXT_COLOR
     button.TextSize = 14
+    button.Font = Enum.Font.SourceSansBold
     button.Parent = parent
     Instance.new("UICorner", button).CornerRadius = CONFIG.CORNER_RADIUS
     return button
@@ -47,8 +56,9 @@ local function createLabel(name, size, position, parent)
     label.Size = size
     label.Position = position
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.TextSize = 18
+    label.TextColor3 = CONFIG.TEXT_COLOR
+    label.TextSize = 14
+    label.Font = Enum.Font.SourceSans
     label.Parent = parent
     return label
 end
@@ -56,7 +66,7 @@ end
 -- GUI Creation
 local function createGUI()
     gui = Instance.new("ScreenGui")
-    gui.Name = "PlayerGUI"
+    gui.Name = "EnhancedPlayerGUI"
     gui.ResetOnSpawn = false
     gui.Parent = player:WaitForChild("PlayerGui")
 
@@ -74,12 +84,14 @@ local function createGUI()
     local titleBar = Instance.new("Frame")
     titleBar.Name = "TitleBar"
     titleBar.Size = UDim2.new(1, 0, 0, 30)
-    titleBar.BackgroundColor3 = CONFIG.SECONDARY_COLOR
+    titleBar.BackgroundColor3 = CONFIG.ACCENT_COLOR
     titleBar.Parent = mainFrame
     Instance.new("UICorner", titleBar).CornerRadius = CONFIG.CORNER_RADIUS
 
     local titleLabel = createLabel("TitleLabel", UDim2.new(1, -60, 1, 0), UDim2.new(0, 10, 0, 0), titleBar)
-    titleLabel.Text = "Player GUI"
+    titleLabel.Text = "Enhanced Player GUI"
+    titleLabel.TextSize = 18
+    titleLabel.Font = Enum.Font.SourceSansBold
 
     local closeButton = createButton("CloseButton", UDim2.new(0, 30, 0, 30), UDim2.new(1, -30, 0, 0), titleBar)
     closeButton.Text = "X"
@@ -91,35 +103,38 @@ local function createGUI()
 
     contentFrame = Instance.new("Frame")
     contentFrame.Name = "ContentFrame"
-    contentFrame.Size = UDim2.new(1, 0, 1, -30)
-    contentFrame.Position = UDim2.new(0, 0, 0, 30)
+    contentFrame.Size = UDim2.new(1, -20, 1, -70)
+    contentFrame.Position = UDim2.new(0, 10, 0, 40)
     contentFrame.BackgroundTransparency = 1
     contentFrame.Parent = mainFrame
 
-    local speedLabel = createLabel("SpeedLabel", UDim2.new(0, 180, 0, 30), UDim2.new(0, 10, 0, 10), contentFrame)
-    local jumpPowerLabel = createLabel("JumpPowerLabel", UDim2.new(0, 180, 0, 30), UDim2.new(0, 10, 0, 90), contentFrame)
+    local speedLabel = createLabel("SpeedLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 10), contentFrame)
+    local jumpPowerLabel = createLabel("JumpPowerLabel", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 0, 70), contentFrame)
 
-    local decreaseSpeedButton = createButton("DecreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 10, 0, 50), contentFrame)
+    local decreaseSpeedButton = createButton("DecreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 35), contentFrame)
     decreaseSpeedButton.Text = "-"
 
-    local increaseSpeedButton = createButton("IncreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 140, 0, 50), contentFrame)
+    local increaseSpeedButton = createButton("IncreaseSpeedButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 35), contentFrame)
     increaseSpeedButton.Text = "+"
 
-    local decreaseJumpPowerButton = createButton("DecreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 10, 0, 130), contentFrame)
+    local decreaseJumpPowerButton = createButton("DecreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 0, 0, 95), contentFrame)
     decreaseJumpPowerButton.Text = "-"
 
-    local increaseJumpPowerButton = createButton("IncreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(0, 140, 0, 130), contentFrame)
+    local increaseJumpPowerButton = createButton("IncreaseJumpPowerButton", UDim2.new(0, 50, 0, 30), UDim2.new(1, -50, 0, 95), contentFrame)
     increaseJumpPowerButton.Text = "+"
 
-    local textureRemoverButton = createButton("TextureRemoverButton", UDim2.new(0, 180, 0, 30), UDim2.new(0, 10, 0, 170), contentFrame)
+    local textureRemoverButton = createButton("TextureRemoverButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 135), contentFrame)
     textureRemoverButton.Text = "Remove Textures"
 
-    local honeyDupeButton = createButton("HoneyDupeButton", UDim2.new(0, 180, 0, 30), UDim2.new(0, 10, 0, 210), contentFrame)
+    local honeyDupeButton = createButton("HoneyDupeButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 175), contentFrame)
     honeyDupeButton.Text = "Honey Dupe: OFF"
 
-    local footer = createLabel("Footer", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 1, -20), contentFrame)
-    footer.Text = "Made by Spartan also the honey dupe is a Work in progress"
-    footer.TextSize = 14
+    local autoHitButton = createButton("AutoHitButton", UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 215), contentFrame)
+    autoHitButton.Text = "Auto Hit: OFF"
+
+    local footer = createLabel("Footer", UDim2.new(1, 0, 0, 20), UDim2.new(0, 0, 1, -20), mainFrame)
+    footer.Text = "Made by Spartan"
+    footer.TextSize = 12
 
     return {
         speedLabel = speedLabel,
@@ -130,6 +145,7 @@ local function createGUI()
         increaseJumpPowerButton = increaseJumpPowerButton,
         textureRemoverButton = textureRemoverButton,
         honeyDupeButton = honeyDupeButton,
+        autoHitButton = autoHitButton,
         closeButton = closeButton,
         minimizeButton = minimizeButton
     }
@@ -168,6 +184,11 @@ local function toggleHoneyDupe(button)
     button.Text = isDuping and "Honey Dupe: ON" or "Honey Dupe: OFF"
 end
 
+local function toggleAutoHit(button)
+    isAutoHitting = not isAutoHitting
+    button.Text = isAutoHitting and "Auto Hit: ON" or "Auto Hit: OFF"
+end
+
 local function closeGUI()
     gui:Destroy()
 end
@@ -195,6 +216,14 @@ local function playerAdded(player)
     end)
     if player.Character then
         createESP(player)
+    end
+end
+
+-- Auto Hit Function
+local function autoHit()
+    local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+    if tool and tool:FindFirstChild("Handle") then
+        tool:Activate()
     end
 end
 
@@ -231,6 +260,9 @@ local function init()
     guiElements.honeyDupeButton.MouseButton1Click:Connect(function()
         toggleHoneyDupe(guiElements.honeyDupeButton)
     end)
+    guiElements.autoHitButton.MouseButton1Click:Connect(function()
+        toggleAutoHit(guiElements.autoHitButton)
+    end)
     guiElements.closeButton.MouseButton1Click:Connect(closeGUI)
     guiElements.minimizeButton.MouseButton1Click:Connect(minimizeGUI)
 
@@ -248,6 +280,10 @@ local function init()
             humanoid = character.Humanoid
             humanoid.WalkSpeed = speedValue
             humanoid.JumpPower = jumpPowerValue
+        end
+
+        if isAutoHitting then
+            autoHit()
         end
     end)
 
